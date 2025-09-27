@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stechtic Admin Panel</title>
+  <style>
+    /* Reset and box sizing */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background: var(--bg-color, #fafafa);
+      color: var(--text-color, #212529);
+      overflow-x: hidden; /* prevent horizontal scroll */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* CSS theme variables */
+    :root {
+      --bg-color: #fafafa;
+      --container-bg: #fff;
+      --text-color: #212529;
+      --input-bg: #fff;
+      --input-border: #ccc;
+      --btn-bg: #28a745;
+      --btn-hover-bg: #218838;
+      --footer-bg: #f8f9fa;
+      --footer-text: #6c757d;
+      --nav-bg: #f8f9fa;
+      --nav-text: #212529;
+      --btn-delete-bg: #dc3545;
+      --btn-delete-hover-bg: #c82333;
+      --comment-bg: #dcf8c6;
+      --comment-name-color: #34b7f1;
+    }
+    body.dark {
+      --bg-color: #121212;
+      --container-bg: #1e1e1e;
+      --text-color: #e0e0e0;
+      --input-bg: #2a2a2a;
+      --input-border: #555;
+      --btn-bg: #005c2f;
+      --btn-hover-bg: #00401f;
+      --footer-bg: #1e1e1e;
+      --footer-text: #aaa;
+      --nav-bg: #1e1e1e;
+      --nav-text: #e0e0e0;
+      --btn-delete-bg: #b02a37;
+      --btn-delete-hover-bg: #7f1d25;
+      --comment-bg: #2e4a2e;
+      --comment-name-color: #63a7de;
+    }
+
+    /* Navbar */
+    nav.navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100vw;
+      height: 56px;
+      background: var(--nav-bg);
+      color: var(--nav-text);
+      display: flex;
+      align-items: center;
+      padding: 0 1rem;
+      font-weight: 600;
+      font-size: 1.25rem;
+      justify-content: space-between;
+      user-select: none;
+      z-index: 1100;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-bottom: none;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    nav .brand {
+      user-select: none;
+    }
+    nav button#theme-toggle {
+      background: none;
+      border: none;
+      color: var(--nav-text);
+      font-weight: 500;
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    nav button#theme-toggle:hover {
+      background-color: rgba(0,0,0,0.1);
+    }
+    #hamburger {
+      cursor: pointer;
+      width: 25px;
+      height: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #hamburger div {
+      background-color: var(--nav-text);
+      height: 3px;
+      border-radius: 2px;
+      transition: background-color 0.3s;
+    }
+    #hamburger:hover div, #hamburger:focus div {
+      background-color: var(--btn-hover-bg);
+    }
+
+    /* Main container */
+    main.container {
+      max-width: 900px;
+      margin: 70px auto 0 auto; /* pushes below navbar */
+      background: var(--container-bg);
+      border-radius: 8px;
+      padding: 20px 30px 80px 30px; /* padding-bottom for footer room */
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      min-height: calc(100vh - 126px); /* full height minus navbar + footer */
+      box-sizing: border-box;
+      transition: background-color 0.3s, color 0.3s;
+      overflow-wrap: break-word;
+    }
+
+    /* Inputs and buttons */
+    input, button {
+      padding: 8px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid var(--input-border);
+      font-size: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }
+    button {
+      background-color: var(--btn-bg);
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: var(--btn-hover-bg);
+    }
+    button.delete {
+      background-color: var(--btn-delete-bg);
+    }
+    button.delete:hover {
+      background-color: var(--btn-delete-hover-bg);
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 0.95rem;
+      word-break: break-word;
+    }
+    th, td {
+      border: 1px solid #dee2e6;
+      padding: 8px;
+      text-align: center;
+      vertical-align: top;
+      color: var(--text-color);
+      transition: color 0.3s;
+    }
+    th {
+      background-color: var(--btn-hover-bg, #f2f2f2);
+    }
+
+    /* Footer */
+    footer.footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      height: 56px;
+      background-color: var(--footer-bg);
+      box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      color: var(--footer-text);
+      user-select: none;
+      transition: background-color 0.3s, color 0.3s;
+      z-index: 1100;
+    }
+
+    /* Scrollable content sections */
+    #last-month-attendance, #attendance-status-summary {
+      max-height: 320px;
+      overflow-y: auto;
+      margin-top: 1rem;
+      color: var(--text-color);
+      transition: color 0.3s;
+    }
+
+    /* Comments sidebar */
+    #comments-sidebar {
+      position: fixed;
+      top: 56px;
+      right: 0;
+      height: calc(100% - 112px);
+      width: 350px;
+      background: var(--container-bg);
+      box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+      overflow-y: auto;
+      padding: 20px;
+      display: none;
+      flex-direction: column;
+      z-index: 1200;
+      border-left: 1px solid #dee2e6;
+      box-sizing: border-box;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    #comments-sidebar.active {
+      display: flex;
+    }
+    #comments-header {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-color);
+      transition: color 0.3s;
+    }
+    #close-comments {
+      background-color: var(--btn-delete-bg);
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 1.2rem;
+      line-height: 1;
+      transition: background-color 0.3s;
+    }
+    #close-comments:hover {
+      background-color: var(--btn-delete-hover-bg);
+    }
+    #comments-list {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+      font-size: 0.9rem;
+      color: var(--text-color);
+      transition: color 0.3s;
+    }
+    .comment-bubble {
+      max-width: 90%;
+      padding: 10px;
+      background-color: var(--comment-bg);
+      border-radius: 8px;
+      box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .comment-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: var(--comment-name-color);
+      transition: color 0.3s;
+    }
+    .attendance-list {
+      max-height: 150px;
+      overflow-y: auto;
+      text-align: left;
+      font-size: 0.9rem;
+      margin: 0;
+      padding-left: 20px;
+      color: var(--text-color);
+      transition: color 0.3s;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      main.container {
+        margin: 70px 10px 0 10px;
+        width: auto;
+      }
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      #comments-sidebar {
+        width: 80vw;
+        height: calc(100% - 112px);
+      }
+    }
+    @media (max-width: 400px) {
+      input, button {
+        padding: 12px;
+        font-size: 1.1rem;
+      }
+      nav.navbar {
+        font-size: 1rem;
+        padding: 0 0.5rem;
+      }
+      #close-comments {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <span class="brand">Stechtic</span>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <button id="theme-toggle" aria-label="Toggle dark mode">Dark Mode</button>
+      <div id="hamburger" aria-label="Toggle comments sidebar" role="button" tabindex="0" style="width:25px; height:20px; cursor:pointer; display:flex; flex-direction: column; justify-content: space-between;">
+        <div style="height:3px; background-color: var(--nav-text); border-radius:2px;"></div>
+        <div style="height:3px; background-color: var(--nav-text); border-radius:2px;"></div>
+        <div style="height:3px; background-color: var(--nav-text); border-radius:2px;"></div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container">
+    <h2>Admin Panel - Manage Users & Attendance</h2>
+
+    <h3>Add New User</h3>
+    <input type="text" id="new-name" placeholder="Name" />
+    <input type="email" id="new-email" placeholder="Email" />
+    <input type="password" id="new-password" placeholder="Password" />
+    <button onclick="addUser()">Add User</button>
+    <p id="add-user-msg"></p>
+
+    <h3>Attendance Status Today (<span id="today-date"></span>)</h3>
+    <button onclick="showAttendanceStatus()">Show Attendance Status Today</button>
+
+    <button style="margin-top:20px;" onclick="showLastMonthAttendance()">Show Last 1 Month Attendance</button>
+
+    <div id="attendance-status-summary" style="margin-top: 10px; font-weight: bold;"></div>
+    <div id="last-month-attendance" style="margin-top:20px; max-height:400px; overflow-y:auto; display:none;"></div>
+
+    <table id="attendance-table" style="margin-top:20px;">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>User Email</th>
+          <th>Attendance Marked?</th>
+          <th>Mark Time</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="attendance-body"></tbody>
+    </table>
+  </main>
+
+  <aside id="comments-sidebar" aria-hidden="true">
+    <div id="comments-header">
+      <span>Attendance Comments</span>
+      <button id="close-comments" aria-label="Close Comments">&times;</button>
+    </div>
+    <div id="comments-list"></div>
+  </aside>
+
+  <footer class="footer">
+    &copy; 2025 Stechtic. All rights reserved.
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAVqO_A0CFQERASJyUJf1brk2ke8ZUguhA",
+      authDomain: "language-1e856.firebaseapp.com",
+      databaseURL: "https://language-1e856-default-rtdb.firebaseio.com",
+      projectId: "language-1e856",
+      storageBucket: "language-1e856.firebasestorage.app",
+      messagingSenderId: "1011104666699",
+      appId: "1:1011104666699:web:83222c841d90ec3502a9ce",
+      measurementId: "G-963KLS1HKK"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const body = document.body;
+    const hamburger = document.getElementById('hamburger');
+    const commentsSidebar = document.getElementById('comments-sidebar');
+    const closeCommentsBtn = document.getElementById('close-comments');
+
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if(savedTheme === 'dark'){
+      body.classList.add('dark');
+      themeToggleBtn.textContent = 'Light Mode';
+    } else {
+      themeToggleBtn.textContent = 'Dark Mode';
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      if(body.classList.contains('dark')){
+        body.classList.remove('dark');
+        themeToggleBtn.textContent = 'Dark Mode';
+        localStorage.setItem('theme', 'light');
+      } else {
+        body.classList.add('dark');
+        themeToggleBtn.textContent = 'Light Mode';
+        localStorage.setItem('theme', 'dark');
+      }
+    });
+
+    hamburger.addEventListener('click', () => {
+      const isActive = commentsSidebar.classList.toggle('active');
+      commentsSidebar.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+    });
+
+    closeCommentsBtn.addEventListener('click', () => {
+      commentsSidebar.classList.remove('active');
+      commentsSidebar.setAttribute('aria-hidden', 'true');
+    });
+
+    const localDate = new Date();
+    const pad = (n) => n < 10 ? '0' + n : n;
+    const formattedLocalDate = localDate.getFullYear() + '-' + pad(localDate.getMonth() + 1) + '-' + pad(localDate.getDate());
+    document.getElementById('today-date').textContent = formattedLocalDate;
+
+    async function addUser(){
+      const name = document.getElementById('new-name').value.trim();
+      const email = document.getElementById('new-email').value.trim();
+      const password = document.getElementById('new-password').value.trim();
+      const msg = document.getElementById('add-user-msg');
+      msg.textContent = '';
+      msg.className = '';
+
+      if(!name || !email || !password) {
+        msg.textContent = 'Enter name, email and password';
+        msg.className = 'error';
+        return;
+      }
+
+      const existingUser = await db.collection('users').where('email', '==', email).get();
+      if(!existingUser.empty) {
+        msg.textContent = 'User with this email already exists';
+        msg.className = 'error';
+        return;
+      }
+
+      await db.collection('users').add({ name, email, password, role: 'student' });
+      msg.textContent = 'User added successfully';
+      document.getElementById('new-name').value = '';
+      document.getElementById('new-email').value = '';
+      document.getElementById('new-password').value = '';
+
+      loadAttendanceStatus();
+    }
+
+    async function loadAttendanceStatus(){
+      document.getElementById('attendance-table').style.display = 'table';
+      document.getElementById('attendance-status-summary').style.display = 'block';
+      document.getElementById('last-month-attendance').style.display = 'none';
+
+      const tbody = document.getElementById('attendance-body');
+      tbody.innerHTML = '';
+
+      const usersSnapshot = await db.collection('users').get();
+      const attendanceSnapshot = await db.collection('attendance')
+        .where('date', '==', formattedLocalDate)
+        .get();
+
+      const attendanceMap = {};
+      attendanceSnapshot.forEach(doc => {
+        const data = doc.data();
+        attendanceMap[data.userId] = { ...data, id: doc.id };
+      });
+
+      usersSnapshot.forEach(userDoc => {
+        const user = userDoc.data();
+        const userId = userDoc.id;
+        const attendance = attendanceMap[userId];
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+          <td>${user.name || '-'}</td>
+          <td>${user.email}</td>
+          <td>${attendance ? 'Yes' : 'No'}</td>
+          <td>${attendance ? attendance.time : '-'}</td>
+          <td>
+            <button class="delete" onclick="deleteUser('${userId}')">Delete User</button>
+            ${attendance ? `<button class="delete" onclick="deleteAttendance('${attendance.id}')">Delete Attendance</button>` : ''}
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    async function deleteUser(userId){
+      if(!confirm('Delete user and all their attendance?')) return;
+
+      const attSnapshot = await db.collection('attendance').where('userId', '==', userId).get();
+      const batch = db.batch();
+
+      attSnapshot.forEach(doc => batch.delete(doc.ref));
+      batch.delete(db.collection('users').doc(userId));
+
+      await batch.commit();
+
+      alert('User and attendance deleted');
+      loadAttendanceStatus();
+    }
+
+    async function deleteAttendance(attendanceId){
+      if(!confirm('Delete this attendance record?')) return;
+
+      await db.collection('attendance').doc(attendanceId).delete();
+
+      alert('Attendance deleted');
+      loadAttendanceStatus();
+    }
+
+    async function showAttendanceStatus() {
+      const summaryDiv = document.getElementById('attendance-status-summary');
+      summaryDiv.textContent = 'Loading attendance summary...';
+
+      const usersSnapshot = await db.collection('users').get();
+      const attendanceSnapshot = await db.collection('attendance')
+        .where('date', '==', formattedLocalDate)
+        .get();
+
+      const attendanceMap = {};
+      attendanceSnapshot.forEach(doc => {
+        attendanceMap[doc.data().userId] = true;
+      });
+
+      let markedCount = 0;
+      let notMarkedCount = 0;
+      const markedUsers = [];
+      const notMarkedUsers = [];
+
+      usersSnapshot.forEach(userDoc => {
+        const user = userDoc.data();
+        const userId = userDoc.id;
+        if (attendanceMap[userId]) {
+          markedCount++;
+          markedUsers.push(user.email);
+        } else {
+          notMarkedCount++;
+          notMarkedUsers.push(user.email);
+        }
+      });
+
+      summaryDiv.innerHTML = `
+        <p>Attendance Today: Marked - ${markedCount}, Not Marked - ${notMarkedCount}</p>
+        <p><b>Marked:</b> ${markedUsers.join(', ') || 'None'}</p>
+        <p><b>Not Marked:</b> ${notMarkedUsers.join(', ') || 'None'}</p>
+      `;
+
+      loadComments(formattedLocalDate);
+      toggleComments(false);
+
+      document.getElementById('last-month-attendance').style.display = 'none';
+      summaryDiv.style.display = 'block';
+      document.getElementById('attendance-table').style.display = 'table';
+    }
+
+    async function loadComments(date) {
+      const commentsList = document.getElementById('comments-list');
+      commentsList.innerHTML = '<p>Loading comments...</p>';
+
+      const snapshot = await db.collection('attendance')
+        .where('date', '==', date)
+        .get();
+
+      if(snapshot.empty){
+        commentsList.innerHTML = '<p>No comments for today.</p>';
+        return;
+      }
+
+      commentsList.innerHTML = '';
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        if(data.name && data.comment){
+          const bubble = document.createElement('div');
+          bubble.className = 'comment-bubble';
+
+          bubble.innerHTML = `<div class="comment-name">${escapeHtml(data.name)}</div>
+                              <div>${escapeHtml(data.comment)}</div>`;
+          commentsList.appendChild(bubble);
+        }
+      });
+
+      if(commentsList.children.length === 0){
+        commentsList.innerHTML = '<p>No comments for today.</p>';
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    async function showLastMonthAttendance(){
+      const container = document.getElementById('last-month-attendance');
+      container.innerHTML = '<p>Loading last 1 month attendance...</p>';
+      container.style.display = 'block';
+
+      const today = new Date();
+      const pastDate = new Date();
+      pastDate.setDate(today.getDate() - 30);
+
+      const usersSnapshot = await db.collection('users').get();
+
+      const usersMap = {};
+      usersSnapshot.forEach(userDoc => {
+        const u = userDoc.data();
+        usersMap[userDoc.id] = { name: u.name || '-', email: u.email };
+      });
+
+      const attendanceSnapshot = await db.collection('attendance')
+        .orderBy('date', 'desc')
+        .get();
+
+      const attendanceRecords = [];
+      attendanceSnapshot.forEach(doc => {
+        const data = doc.data();
+        if(data.date >= pastDate.toISOString().slice(0,10)){
+          attendanceRecords.push({ ...data, id: doc.id });
+        }
+      });
+
+      const attendanceByUser = {};
+      attendanceRecords.forEach(rec => {
+        if (!attendanceByUser[rec.userId]) attendanceByUser[rec.userId] = [];
+        attendanceByUser[rec.userId].push(rec);
+      });
+
+      let html = '<table><thead><tr><th>Name</th><th>Email</th><th>Attendance Dates (last 30 days)</th></tr></thead><tbody>';
+
+      for(const userId in usersMap){
+        const user = usersMap[userId];
+        const records = attendanceByUser[userId] || [];
+        const attendanceListHtml = records.length ?
+          '<ul class="attendance-list">' +
+            records.map(r => `<li>${r.date} at ${r.time}</li>`).join('') +
+          '</ul>' : 'No attendance';
+
+        html += `<tr>
+          <td>${user.name}</td>
+          <td>${user.email}</td>
+          <td>${attendanceListHtml}</td>
+        </tr>`;
+      }
+      html += '</tbody></table>';
+
+      container.innerHTML = html;
+
+      // Hide today's summary and table
+      document.getElementById('attendance-status-summary').style.display = 'none';
+      document.getElementById('attendance-table').style.display = 'none';
+    }
+
+    // Initialize page
+    loadAttendanceStatus();
+  </script>
+</body>
+</html>
