@@ -525,6 +525,17 @@
       loadAttendanceStatus();
     }
 
+    function convert24To12Hour(time24) {
+  const [hourStr, minute, second] = time24.split(':');
+  let hour = parseInt(hourStr, 10);
+  const ampm = hour >= 12 ? 'PM' : 'AM';
+  hour = hour % 12;
+  if (hour === 0) hour = 12;
+  const hourStr12 = hour < 10 ? '0' + hour : hour.toString();
+  return `${hourStr12}:${minute}:${second} ${ampm}`;
+}
+
+    
     async function loadAttendanceStatus() {
       document.getElementById('attendance-table').style.display = 'table';
       document.getElementById('attendance-status-summary').style.display = 'block';
@@ -554,7 +565,8 @@
           <td>${user.name || '-'}</td>
           <td>${user.email}</td>
           <td>${attendance ? 'Yes' : 'No'}</td>
-          <td>${attendance ? attendance.time : '-'}</td>
+          <td>${attendance ? convert24To12Hour(attendance.time) : '-'}</td>
+
           <td>
             <button class="delete" onclick="deleteUser('${userId}')">Delete User</button>
             ${attendance ? `<button class="delete" onclick="deleteAttendance('${attendance.id}')">Delete Attendance</button>` : ''}
@@ -740,6 +752,7 @@
 
 
 </html>
+
 
 
 
