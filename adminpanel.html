@@ -727,7 +727,7 @@
         const records = attendanceByUser[userId] || [];
         const attendanceListHtml = records.length ?
           '<ul class="attendance-list">' +
-          records.map(r => `<li>${r.date} at ${convert24To12Hour(r.time)}</li>`).join('') +
+          records.map(r => `<li>${r.date} at ${convert24OrPreservedTime(r.time)}</li>`).join('') +
           '</ul>' : 'No attendance';
 
         html += `<tr>
@@ -752,6 +752,7 @@
 
 
 </html>
+
 
 
 
