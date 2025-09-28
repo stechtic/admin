@@ -137,9 +137,6 @@
         }
         const storedPin = pinDoc.data().pin;
 
-        console.log('Entered PIN:', enteredPin);
-        console.log('Stored PIN:', storedPin);
-
         if (enteredPin === storedPin) {
           localStorage.setItem('adminPinLoggedIn', 'true');
           window.location.href = 'adminpanel.html'; // change to your admin panel filename
@@ -156,3 +153,4 @@
   </script>
 </body>
 </html>
+
