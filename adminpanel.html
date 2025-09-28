@@ -648,16 +648,19 @@
 
       commentsList.innerHTML = '';
       snapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.name && data.comment) {
-          const bubble = document.createElement('div');
-          bubble.className = 'comment-bubble';
+  const data = doc.data();
+  if (data.name && data.comment) {
+    const bubble = document.createElement('div');
+    bubble.className = 'comment-bubble';
 
-          bubble.innerHTML = `<div class="comment-name">${escapeHtml(data.name)}</div>
-                              <div>${escapeHtml(data.comment)}</div>`;
-          commentsList.appendChild(bubble);
-        }
-      });
+    bubble.innerHTML = `
+      <div class="comment-name">${escapeHtml(data.name)}</div>
+      <div class="comment-email" style="font-size:0.85rem; color: gray;">${escapeHtml(data.email || '')}</div>
+      <div>${escapeHtml(data.comment)}</div>`;
+    commentsList.appendChild(bubble);
+  }
+});
+
 
       if (commentsList.children.length === 0) {
         commentsList.innerHTML = '<p>No comments for today.</p>';
@@ -737,6 +740,7 @@
 
 
 </html>
+
 
 
 
