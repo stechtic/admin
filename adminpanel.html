@@ -525,7 +525,7 @@
       loadAttendanceStatus();
     }
 
-    function convert24To12Hour(time24) {
+function convert24To12Hour(time24) {
   const [hourStr, minute, second] = time24.split(':');
   let hour = parseInt(hourStr, 10);
   const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -534,6 +534,15 @@
   const hourStr12 = hour < 10 ? '0' + hour : hour.toString();
   return `${hourStr12}:${minute}:${second} ${ampm}`;
 }
+
+function convert24OrPreservedTime(timeStr) {
+  if (!timeStr) return '';
+  if (/[AP]M$/i.test(timeStr.trim())) {
+    return timeStr;
+  }
+  return convert24To12Hour(timeStr);
+}
+
 
     
     async function loadAttendanceStatus() {
@@ -752,6 +761,7 @@
 
 
 </html>
+
 
 
 
