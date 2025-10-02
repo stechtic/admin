@@ -98,25 +98,6 @@
   nav button#theme-toggle:hover {
     background-color: rgba(0, 0, 0, 0.1);
   }
-  #hamburger {
-    cursor: pointer;
-    width: 25px;
-    height: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    -webkit-tap-highlight-color: transparent;
-  }
-  #hamburger div {
-    background-color: var(--nav-text);
-    height: 3px;
-    border-radius: 2px;
-    transition: background-color 0.3s;
-  }
-  #hamburger:hover div,
-  #hamburger:focus div {
-    background-color: var(--btn-hover-bg);
-  }
 
   /* Main container */
   main.container {
@@ -132,8 +113,9 @@
     overflow-wrap: break-word;
   }
 
-  /* Inputs and buttons */
+  /* Inputs, buttons, select */
   input,
+  select,
   button {
     padding: 8px;
     margin: 8px 0;
@@ -146,6 +128,9 @@
     color: var(--text-color);
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
   }
+  select {
+    cursor: pointer;
+  }
   button {
     background-color: var(--btn-bg);
     border: none;
@@ -153,13 +138,17 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
-  button:hover {
+  button:hover:not(:disabled) {
     background-color: var(--btn-hover-bg);
+  }
+  button:disabled {
+    background-color: #888888;
+    cursor: not-allowed;
   }
   button.delete {
     background-color: var(--btn-delete-bg);
   }
-  button.delete:hover {
+  button.delete:hover:not(:disabled) {
     background-color: var(--btn-delete-hover-bg);
   }
 
@@ -373,6 +362,7 @@
   }
 </style>
 
+
 </head>
 
 <body>
@@ -400,12 +390,15 @@
     <button onclick="addUser()">Add User</button>
     <p id="add-user-msg"></p>
 
-    <h3>Attendance Status Today (<span id="today-date"></span>)</h3>
-    <button onclick="showAttendanceStatus()">Show Attendance Status Today</button>
+  <h3>Attendance Status Today (<span id="today-date"></span>)</h3>
 
-    <button style="margin-top:20px;" onclick="showLastMonthAttendance()">Show Last 1 Month Attendance</button>
+<select id="dateSelect" aria-label="Select Date"></select>
+<button onclick="loadSelectedDate()">Load Date Data</button>
 
-    <div id="attendance-status-summary" style="margin-top: 10px; font-weight: bold;"></div>
+<button onclick="showAttendanceStatus()">Show Attendance Status Today</button>
+<button style="margin-top:20px;" onclick="showLastMonthAttendance()">Show Last 1 Month Attendance</button>
+
+ <div id="attendance-status-summary" style="margin-top: 10px; font-weight: bold;"></div>
     <div id="last-month-attendance" style="margin-top:20px; max-height:400px; overflow-y:auto; display:none;"></div>
 
     <div class="table-container">
@@ -439,339 +432,322 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAVqO_A0CFQERASJyUJf1brk2ke8ZUguhA",
-      authDomain: "language-1e856.firebaseapp.com",
-      databaseURL: "https://language-1e856-default-rtdb.firebaseio.com",
-      projectId: "language-1e856",
-      storageBucket: "language-1e856.firebasestorage.app",
-      messagingSenderId: "1011104666699",
-      appId: "1:1011104666699:web:83222c841d90ec3502a9ce",
-      measurementId: "G-963KLS1HKK"
-    };
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAVqO_A0CFQERASJyUJf1brk2ke8ZUguhA",
+    authDomain: "language-1e856.firebaseapp.com",
+    databaseURL: "https://language-1e856-default-rtdb.firebaseio.com",
+    projectId: "language-1e856",
+    storageBucket: "language-1e856.firebasestorage.app",
+    messagingSenderId: "1011104666699",
+    appId: "1:1011104666699:web:83222c841d90ec3502a9ce",
+    measurementId: "G-963KLS1HKK"
+  };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    const body = document.body;
-    const hamburger = document.getElementById('hamburger');
-    const commentsSidebar = document.getElementById('comments-sidebar');
-    const closeCommentsBtn = document.getElementById('close-comments');
+  const themeToggleBtn = document.getElementById('theme-toggle');
+  const body = document.body;
+  const hamburger = document.getElementById('hamburger');
+  const commentsSidebar = document.getElementById('comments-sidebar');
+  const closeCommentsBtn = document.getElementById('close-comments');
 
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    if (savedTheme === 'dark') {
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  if (savedTheme === 'dark') {
+    body.classList.add('dark');
+    themeToggleBtn.textContent = 'Light Mode';
+  } else {
+    themeToggleBtn.textContent = 'Dark Mode';
+  }
+
+  themeToggleBtn.addEventListener('click', () => {
+    if (body.classList.contains('dark')) {
+      body.classList.remove('dark');
+      themeToggleBtn.textContent = 'Dark Mode';
+      localStorage.setItem('theme', 'light');
+    } else {
       body.classList.add('dark');
       themeToggleBtn.textContent = 'Light Mode';
-    } else {
-      themeToggleBtn.textContent = 'Dark Mode';
+      localStorage.setItem('theme', 'dark');
     }
+  });
 
-    themeToggleBtn.addEventListener('click', () => {
-      if (body.classList.contains('dark')) {
-        body.classList.remove('dark');
-        themeToggleBtn.textContent = 'Dark Mode';
-        localStorage.setItem('theme', 'light');
-      } else {
-        body.classList.add('dark');
-        themeToggleBtn.textContent = 'Light Mode';
-        localStorage.setItem('theme', 'dark');
-      }
-    });
+  hamburger.addEventListener('click', () => {
+    const isActive = commentsSidebar.classList.toggle('active');
+    commentsSidebar.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+  });
 
-    hamburger.addEventListener('click', () => {
-      const isActive = commentsSidebar.classList.toggle('active');
-      commentsSidebar.setAttribute('aria-hidden', isActive ? 'false' : 'true');
-    });
+  closeCommentsBtn.addEventListener('click', () => {
+    commentsSidebar.classList.remove('active');
+    commentsSidebar.setAttribute('aria-hidden', 'true');
+  });
 
-    closeCommentsBtn.addEventListener('click', () => {
-      commentsSidebar.classList.remove('active');
-      commentsSidebar.setAttribute('aria-hidden', 'true');
-    });
-
-    const localDate = new Date();
-    const pad = (n) => n < 10 ? '0' + n : n;
-    const formattedLocalDate = localDate.getFullYear() + '-' + pad(localDate.getMonth() + 1) + '-' + pad(localDate.getDate());
-    document.getElementById('today-date').textContent = formattedLocalDate;
-
-    async function addUser() {
-      const name = document.getElementById('new-name').value.trim();
-      const email = document.getElementById('new-email').value.trim();
-      const password = document.getElementById('new-password').value.trim();
-      const msg = document.getElementById('add-user-msg');
-      msg.textContent = '';
-      msg.className = '';
-
-      if (!name || !email || !password) {
-        msg.textContent = 'Enter name, email and password';
-        msg.className = 'error';
-        return;
-      }
-
-      const existingUser = await db.collection('users').where('email', '==', email).get();
-      if (!existingUser.empty) {
-        msg.textContent = 'User with this email already exists';
-        msg.className = 'error';
-        return;
-      }
-
-      await db.collection('users').add({ name, email, password, role: 'student' });
-      msg.textContent = 'User added successfully';
-      document.getElementById('new-name').value = '';
-      document.getElementById('new-email').value = '';
-      document.getElementById('new-password').value = '';
-
-      loadAttendanceStatus();
-    }
-
-function convert24To12Hour(time24) {
-  const [hourStr, minute, second] = time24.split(':');
-  let hour = parseInt(hourStr, 10);
-  const ampm = hour >= 12 ? 'PM' : 'AM';
-  hour = hour % 12;
-  if (hour === 0) hour = 12;
-  const hourStr12 = hour < 10 ? '0' + hour : hour.toString();
-  return `${hourStr12}:${minute}:${second} ${ampm}`;
-}
-
-function convert24OrPreservedTime(timeStr) {
-  if (!timeStr) return '';
-  if (/[AP]M$/i.test(timeStr.trim())) {
-    return timeStr;
+  function convert24To12Hour(time24) {
+    const [hourStr, minute, second] = time24.split(':');
+    let hour = parseInt(hourStr, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12;
+    if (hour === 0) hour = 12;
+    const hourStr12 = hour < 10 ? '0' + hour : hour.toString();
+    return `${hourStr12}:${minute}:${second} ${ampm}`;
   }
-  return convert24To12Hour(timeStr);
-}
 
-
-    
-    async function loadAttendanceStatus() {
-      document.getElementById('attendance-table').style.display = 'table';
-      document.getElementById('attendance-status-summary').style.display = 'block';
-      document.getElementById('last-month-attendance').style.display = 'none';
-
-      const tbody = document.getElementById('attendance-body');
-      tbody.innerHTML = '';
-
-      const usersSnapshot = await db.collection('users').get();
-      const attendanceSnapshot = await db.collection('attendance')
-        .where('date', '==', formattedLocalDate)
-        .get();
-
-      const attendanceMap = {};
-      attendanceSnapshot.forEach(doc => {
-        const data = doc.data();
-        attendanceMap[data.userId] = { ...data, id: doc.id };
-      });
-
-      usersSnapshot.forEach(userDoc => {
-        const user = userDoc.data();
-        const userId = userDoc.id;
-        const attendance = attendanceMap[userId];
-        const row = document.createElement('tr');
-
-        row.innerHTML = `
-          <td>${user.name || '-'}</td>
-          <td>${user.email}</td>
-          <td>${attendance ? 'Yes' : 'No'}</td>
-          <td>${attendance ? convert24To12Hour(attendance.time) : '-'}</td>
-
-          <td>
-            <button class="delete" onclick="deleteUser('${userId}')">Delete User</button>
-            ${attendance ? `<button class="delete" onclick="deleteAttendance('${attendance.id}')">Delete Attendance</button>` : ''}
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
+  function convert24OrPreservedTime(timeStr) {
+    if (!timeStr) return '';
+    if (/[AP]M$/i.test(timeStr.trim())) {
+      return timeStr;
     }
+    return convert24To12Hour(timeStr);
+  }
 
-    async function deleteUser(userId) {
-      if (!confirm('Delete user and all their attendance?')) return;
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
 
-      const attSnapshot = await db.collection('attendance').where('userId', '==', userId).get();
-      const batch = db.batch();
+  async function loadAttendanceStatusForDate(dateStr) {
+    document.getElementById('attendance-table').style.display = 'table';
+    document.getElementById('attendance-status-summary').style.display = 'block';
+    document.getElementById('last-month-attendance').style.display = 'none';
 
-      attSnapshot.forEach(doc => batch.delete(doc.ref));
-      batch.delete(db.collection('users').doc(userId));
+    const tbody = document.getElementById('attendance-body');
+    tbody.innerHTML = '';
 
-      await batch.commit();
+    const usersSnapshot = await db.collection('users').get();
+    const attendanceSnapshot = await db.collection('attendance')
+      .where('date', '==', dateStr)
+      .get();
 
-      alert('User and attendance deleted');
-      loadAttendanceStatus();
-    }
+    const attendanceMap = {};
+    attendanceSnapshot.forEach(doc => {
+      const data = doc.data();
+      attendanceMap[data.userId] = { ...data, id: doc.id };
+    });
 
-    async function deleteAttendance(attendanceId) {
-      if (!confirm('Delete this attendance record?')) return;
+    usersSnapshot.forEach(userDoc => {
+      const user = userDoc.data();
+      const userId = userDoc.id;
+      const attendance = attendanceMap[userId];
+      const row = document.createElement('tr');
 
-      await db.collection('attendance').doc(attendanceId).delete();
-
-      alert('Attendance deleted');
-      loadAttendanceStatus();
-    }
-
-    async function showAttendanceStatus() {
-      const summaryDiv = document.getElementById('attendance-status-summary');
-      summaryDiv.textContent = 'Loading attendance summary...';
-
-      const usersSnapshot = await db.collection('users').get();
-      const attendanceSnapshot = await db.collection('attendance')
-        .where('date', '==', formattedLocalDate)
-        .get();
-
-      const attendanceMap = {};
-      attendanceSnapshot.forEach(doc => {
-        attendanceMap[doc.data().userId] = true;
-      });
-
-      let markedCount = 0;
-      let notMarkedCount = 0;
-      const markedUsers = [];
-      const notMarkedUsers = [];
-
-      usersSnapshot.forEach(userDoc => {
-        const user = userDoc.data();
-        const userId = userDoc.id;
-        if (attendanceMap[userId]) {
-          markedCount++;
-          markedUsers.push(user.email);
-        } else {
-          notMarkedCount++;
-          notMarkedUsers.push(user.email);
-        }
-      });
-
-      summaryDiv.innerHTML = `
-        <p>Attendance Today: Marked - ${markedCount}, Not Marked - ${notMarkedCount}</p>
-        <p><b>Marked:</b> ${markedUsers.join(', ') || 'None'}</p>
-        <p><b>Not Marked:</b> ${notMarkedUsers.join(', ') || 'None'}</p>
+      row.innerHTML = `
+        <td>${user.name || '-'}</td>
+        <td>${user.email}</td>
+        <td>${attendance ? 'Yes' : 'No'}</td>
+        <td>${attendance ? convert24To12Hour(attendance.time) : '-'}</td>
+        <td>
+          <button class="delete" onclick="deleteUser('${userId}')">Delete User</button>
+          ${attendance ? `<button class="delete" onclick="deleteAttendance('${attendance.id}')">Delete Attendance</button>` : ''}
+        </td>
       `;
+      tbody.appendChild(row);
+    });
+  }
 
-      loadComments(formattedLocalDate);
-      toggleComments(false);
+  async function loadComments(dateStr) {
+    const commentsList = document.getElementById('comments-list');
+    commentsList.innerHTML = '<p>Loading comments...</p>';
 
-      document.getElementById('last-month-attendance').style.display = 'none';
-      summaryDiv.style.display = 'block';
-      document.getElementById('attendance-table').style.display = 'table';
+    const snapshot = await db.collection('attendance')
+      .where('date', '==', dateStr)
+      .get();
+
+    if (snapshot.empty) {
+      commentsList.innerHTML = '<p>No comments for this day.</p>';
+      return;
     }
 
-    async function loadComments(date) {
-      const commentsList = document.getElementById('comments-list');
-      commentsList.innerHTML = '<p>Loading comments...</p>';
+    commentsList.innerHTML = '';
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.name && data.comment) {
+        const bubble = document.createElement('div');
+        bubble.className = 'comment-bubble';
+        bubble.innerHTML = `
+          <div class="comment-name">${escapeHtml(data.name)}</div>
+          <div class="comment-email" style="font-size:0.85rem; color: gray;">${escapeHtml(data.email || '')}</div>
+          <div>${escapeHtml(data.comment)}</div>`;
+        commentsList.appendChild(bubble);
+      }
+      if (Array.isArray(data.comments)) {
+        data.comments.forEach(c => {
+          if (c && c.content) {
+            const bubble = document.createElement('div');
+            bubble.className = 'comment-bubble';
+            bubble.innerHTML = `
+              <div class="comment-name">${escapeHtml(data.name)}</div>
+              <div class="comment-email" style="font-size:0.85rem; color: gray;">${escapeHtml(data.email || '')}</div>
+              <div>${escapeHtml(c.content)}</div>
+              <div style="font-size:0.82rem; color: #aaa; margin-top:4px;">${escapeHtml(c.time || '')}</div>`;
+            commentsList.appendChild(bubble);
+          }
+        });
+      }
+    });
 
-      const snapshot = await db.collection('attendance')
-        .where('date', '==', date)
+    if (commentsList.children.length === 0) {
+      commentsList.innerHTML = '<p>No comments for this day.</p>';
+    }
+  }
+
+  async function populateDateDropdown() {
+    const select = document.getElementById('dateSelect');
+    select.innerHTML = '';
+    const today = new Date();
+
+    for(let i = 0; i < 30; i++) {
+      const dateObj = new Date();
+      dateObj.setDate(today.getDate() - i);
+      const dateStr = dateObj.toISOString().slice(0, 10);
+
+      const snap = await db.collection('attendance')
+        .where('date', '==', dateStr)
+        .limit(1)
         .get();
 
-      if (snapshot.empty) {
-        commentsList.innerHTML = '<p>No comments for today.</p>';
-        return;
-      }
-
-      commentsList.innerHTML = '';
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        // For backwards compatibility, first show old 'comment' field (if present)
-        if (data.name && data.comment) {
-          const bubble = document.createElement('div');
-          bubble.className = 'comment-bubble';
-          bubble.innerHTML = `
-            <div class="comment-name">${escapeHtml(data.name)}</div>
-            <div class="comment-email" style="font-size:0.85rem; color: gray;">${escapeHtml(data.email || '')}</div>
-            <div>${escapeHtml(data.comment)}</div>`;
-          commentsList.appendChild(bubble);
-        }
-        // Then, show comments from the 'comments' array (if any)
-        if (Array.isArray(data.comments)) {
-          data.comments.forEach(c => {
-            if (c && c.content) {
-              const bubble = document.createElement('div');
-              bubble.className = 'comment-bubble';
-              bubble.innerHTML = `
-                <div class="comment-name">${escapeHtml(data.name)}</div>
-                <div class="comment-email" style="font-size:0.85rem; color: gray;">${escapeHtml(data.email || '')}</div>
-                <div>${escapeHtml(c.content)}</div>
-                <div style="font-size:0.82rem; color: #aaa; margin-top:4px;">${escapeHtml(c.time || '')}</div>`;
-              commentsList.appendChild(bubble);
-            }
-          });
-        }
-      });
-
-      if (commentsList.children.length === 0) {
-        commentsList.innerHTML = '<p>No comments for today.</p>';
+      if (!snap.empty) {
+        const option = document.createElement('option');
+        option.value = dateStr;
+        option.text = dateStr;
+        if (i === 0) option.selected = true;
+        select.appendChild(option);
       }
     }
 
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
+    if (select.options.length > 0) {
+      loadSelectedDate();
+    }
+  }
+
+  async function loadSelectedDate() {
+    const dateStr = document.getElementById('dateSelect').value;
+    document.getElementById('today-date').textContent = dateStr;
+    await loadAttendanceStatusForDate(dateStr);
+    await loadComments(dateStr);
+  }
+
+  async function addUser() {
+    const name = document.getElementById('new-name').value.trim();
+    const email = document.getElementById('new-email').value.trim();
+    const password = document.getElementById('new-password').value.trim();
+    const msg = document.getElementById('add-user-msg');
+    msg.textContent = '';
+    msg.className = '';
+
+    if (!name || !email || !password) {
+      msg.textContent = 'Enter name, email and password';
+      msg.className = 'error';
+      return;
     }
 
-    async function showLastMonthAttendance() {
-      const container = document.getElementById('last-month-attendance');
-      container.innerHTML = '<p>Loading last 1 month attendance...</p>';
-      container.style.display = 'block';
+    const existingUser = await db.collection('users').where('email', '==', email).get();
+    if (!existingUser.empty) {
+      msg.textContent = 'User with this email already exists';
+      msg.className = 'error';
+      return;
+    }
 
-      const today = new Date();
-      const pastDate = new Date();
-      pastDate.setDate(today.getDate() - 30);
+    await db.collection('users').add({ name, email, password, role: 'student' });
+    msg.textContent = 'User added successfully';
+    document.getElementById('new-name').value = '';
+    document.getElementById('new-email').value = '';
+    document.getElementById('new-password').value = '';
 
-      const usersSnapshot = await db.collection('users').get();
+    loadAttendanceStatusForDate(document.getElementById('dateSelect').value || new Date().toISOString().slice(0,10));
+  }
 
-      const usersMap = {};
-      usersSnapshot.forEach(userDoc => {
-        const u = userDoc.data();
-        usersMap[userDoc.id] = { name: u.name || '-', email: u.email };
-      });
+  async function deleteUser(userId) {
+    if (!confirm('Delete user and all their attendance?')) return;
 
-      const attendanceSnapshot = await db.collection('attendance')
-        .orderBy('date', 'desc')
-        .get();
+    const attSnapshot = await db.collection('attendance').where('userId', '==', userId).get();
+    const batch = db.batch();
 
-      const attendanceRecords = [];
-      attendanceSnapshot.forEach(doc => {
-        const data = doc.data();
-        if (data.date >= pastDate.toISOString().slice(0, 10)) {
-          attendanceRecords.push({ ...data, id: doc.id });
-        }
-      });
+    attSnapshot.forEach(doc => batch.delete(doc.ref));
+    batch.delete(db.collection('users').doc(userId));
 
-      const attendanceByUser = {};
-      attendanceRecords.forEach(rec => {
-        if (!attendanceByUser[rec.userId]) attendanceByUser[rec.userId] = [];
-        attendanceByUser[rec.userId].push(rec);
-      });
+    await batch.commit();
 
-      let html = '<table><thead><tr><th>Name</th><th>Email</th><th>Attendance Dates (last 30 days)</th></tr></thead><tbody>';
+    alert('User and attendance deleted');
+    loadAttendanceStatusForDate(document.getElementById('dateSelect').value || new Date().toISOString().slice(0,10));
+  }
 
-      for (const userId in usersMap) {
-        const user = usersMap[userId];
-        const records = attendanceByUser[userId] || [];
-        const attendanceListHtml = records.length ?
-          '<ul class="attendance-list">' +
-          records.map(r => `<li>${r.date} at ${convert24OrPreservedTime(r.time)}</li>`).join('') +
-          '</ul>' : 'No attendance';
+  async function deleteAttendance(attendanceId) {
+    if (!confirm('Delete this attendance record?')) return;
 
-        html += `<tr>
-          <td>${user.name}</td>
-          <td>${user.email}</td>
-          <td>${attendanceListHtml}</td>
-        </tr>`;
+    await db.collection('attendance').doc(attendanceId).delete();
+
+    alert('Attendance deleted');
+    loadAttendanceStatusForDate(document.getElementById('dateSelect').value || new Date().toISOString().slice(0,10));
+  }
+
+  async function showLastMonthAttendance() {
+    const container = document.getElementById('last-month-attendance');
+    container.innerHTML = '<p>Loading last 1 month attendance...</p>';
+    container.style.display = 'block';
+
+    const today = new Date();
+    const pastDate = new Date();
+    pastDate.setDate(today.getDate() - 30);
+
+    const usersSnapshot = await db.collection('users').get();
+
+    const usersMap = {};
+    usersSnapshot.forEach(userDoc => {
+      const u = userDoc.data();
+      usersMap[userDoc.id] = { name: u.name || '-', email: u.email };
+    });
+
+    const attendanceSnapshot = await db.collection('attendance')
+      .orderBy('date', 'desc')
+      .get();
+
+    const attendanceRecords = [];
+    attendanceSnapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.date >= pastDate.toISOString().slice(0, 10)) {
+        attendanceRecords.push({ ...data, id: doc.id });
       }
-      html += '</tbody></table>';
+    });
 
-      container.innerHTML = html;
+    const attendanceByUser = {};
+    attendanceRecords.forEach(rec => {
+      if (!attendanceByUser[rec.userId]) attendanceByUser[rec.userId] = [];
+      attendanceByUser[rec.userId].push(rec);
+    });
 
-      // Hide today's summary and table
-      document.getElementById('attendance-status-summary').style.display = 'none';
-      document.getElementById('attendance-table').style.display = 'none';
+    let html = '<table><thead><tr><th>Name</th><th>Email</th><th>Attendance Dates (last 30 days)</th></tr></thead><tbody>';
+
+    for (const userId in usersMap) {
+      const user = usersMap[userId];
+      const records = attendanceByUser[userId] || [];
+      const attendanceListHtml = records.length ?
+        '<ul class="attendance-list">' +
+        records.map(r => `<li>${r.date} at ${convert24OrPreservedTime(r.time)}</li>`).join('') +
+        '</ul>' : 'No attendance';
+
+      html += `<tr>
+        <td>${user.name}</td>
+        <td>${user.email}</td>
+        <td>${attendanceListHtml}</td>
+      </tr>`;
     }
+    html += '</tbody></table>';
 
-    // Initialize page
-    loadAttendanceStatus();
-  </script>
+    container.innerHTML = html;
+
+    document.getElementById('attendance-status-summary').style.display = 'none';
+    document.getElementById('attendance-table').style.display = 'none';
+  }
+
+  window.onload = () => {
+    populateDateDropdown();
+  };
+</script>
+
 </body>
 
 
 </html>
+
