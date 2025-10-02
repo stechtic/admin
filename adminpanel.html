@@ -7,366 +7,357 @@
 
   <title>Stechtic Admin Panel</title>
 <style>
-  /* Reset and box sizing */
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: Arial, sans-serif;
-    background: var(--bg-color, #fafafa);
-    color: var(--text-color, #212529);
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+ /* Reset and box sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background: var(--bg-color, #fafafa);
+  color: var(--text-color, #212529);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-  /* CSS theme variables */
-  :root {
-    --bg-color: #fafafa;
-    --container-bg: #fff;
-    --text-color: #212529;
-    --input-bg: #fff;
-    --input-border: #ccc;
-    --btn-bg: #28a745;
-    --btn-hover-bg: #218838;
-    --footer-bg: #f8f9fa;
-    --footer-text: #6c757d;
-    --nav-bg: #f8f9fa;
-    --nav-text: #212529;
-    --btn-delete-bg: #dc3545;
-    --btn-delete-hover-bg: #c82333;
-    --comment-bg: #dcf8c6;
-    --comment-name-color: #34b7f1;
-  }
-  body.dark {
-    --bg-color: #121212;
-    --container-bg: #1e1e1e;
-    --text-color: #e0e0e0;
-    --input-bg: #2a2a2a;
-    --input-border: #555;
-    --btn-bg: #005c2f;
-    --btn-hover-bg: #00401f;
-    --footer-bg: #1e1e1e;
-    --footer-text: #aaa;
-    --nav-bg: #1e1e1e;
-    --nav-text: #e0e0e0;
-    --btn-delete-bg: #b02a37;
-    --btn-delete-hover-bg: #7f1d25;
-    --comment-bg: #2e4a2e;
-    --comment-name-color: #63a7de;
-  }
+/* CSS theme variables */
+:root {
+  --bg-color: #fafafa;
+  --container-bg: #fff;
+  --text-color: #212529;
+  --input-bg: #fff;
+  --input-border: #ccc;
+  --btn-bg: #28a745;
+  --btn-hover-bg: #218838;
+  --footer-bg: #f8f9fa;
+  --footer-text: #6c757d;
+  --nav-bg: #f8f9fa;
+  --nav-text: #212529;
+  --btn-delete-bg: #dc3545;
+  --btn-delete-hover-bg: #c82333;
+  --comment-bg: #dcf8c6;
+  --comment-name-color: #34b7f1;
+}
 
-  /* Navbar */
-  nav.navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100vw;
-    height: 56px;
-    background: var(--nav-bg);
-    color: var(--nav-text);
-    display: flex;
-    align-items: center;
-    padding: 0 1rem;
-    font-weight: 600;
-    font-size: 1.25rem;
-    justify-content: space-between;
-    user-select: none;
-    z-index: 1100;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-bottom: none;
-    transition: background-color 0.3s, color 0.3s;
-  }
-  nav .brand {
-    user-select: none;
-  }
-  nav button#theme-toggle {
-    background: none;
-    border: none;
-    color: var(--nav-text);
-    font-weight: 500;
-    font-size: 1rem;
-    cursor: pointer;
-    padding: 6px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-  }
-  nav button#theme-toggle:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-  }
+body.dark {
+  --bg-color: #121212;
+  --container-bg: #1e1e1e;
+  --text-color: #e0e0e0;
+  --input-bg: #2a2a2a;
+  --input-border: #555;
+  --btn-bg: #005c2f;
+  --btn-hover-bg: #00401f;
+  --footer-bg: #1e1e1e;
+  --footer-text: #aaa;
+  --nav-bg: #1e1e1e;
+  --nav-text: #e0e0e0;
+  --btn-delete-bg: #b02a37;
+  --btn-delete-hover-bg: #7f1d25;
+  --comment-bg: #2e4a2e;
+  --comment-name-color: #63a7de;
+}
 
-  /* Main container */
+/* Navbar */
+nav.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  height: 56px;
+  background: var(--nav-bg);
+  color: var(--nav-text);
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  font-weight: 600;
+  font-size: 1.25rem;
+  justify-content: space-between;
+  user-select: none;
+  z-index: 1100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-bottom: none;
+  transition: background-color 0.3s, color 0.3s;
+}
+nav .brand {
+  user-select: none;
+}
+nav button#theme-toggle {
+  background: none;
+  border: none;
+  color: var(--nav-text);
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+nav button#theme-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Main container */
+main.container {
+  max-width: 900px;
+  margin: 90px auto 0 auto; /* pushes below navbar */
+  background: var(--container-bg);
+  border-radius: 8px;
+  padding: 50px 30px 120px 30px; /* extra padding-bottom for footer */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  min-height: calc(100vh - 126px); /* full height minus navbar + footer */
+  box-sizing: border-box;
+  transition: background-color 0.3s, color 0.3s;
+  overflow-wrap: break-word;
+}
+
+/* Inputs, buttons */
+input,
+button {
+  padding: 8px;
+  margin: 8px 0;
+  border-radius: 5px;
+  border: 1px solid var(--input-border);
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+button {
+  background-color: var(--btn-bg);
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+button:hover {
+  background-color: var(--btn-hover-bg);
+}
+button.delete {
+  background-color: var(--btn-delete-bg);
+}
+button.delete:hover {
+  background-color: var(--btn-delete-hover-bg);
+}
+
+/* Table container */
+.table-container {
+  max-width: 900px;
+  margin: 20px auto;
+  overflow-x: auto;
+  background: transparent;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+th,
+td {
+  border: 1px solid #dee2e6;
+  padding: 8px;
+  text-align: center;
+  vertical-align: top;
+  color: var(--text-color);
+  transition: color 0.3s;
+}
+th {
+  background-color: var(--btn-hover-bg, #016a36);
+  color: #fff;
+}
+
+/* Footer */
+footer.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 56px;
+  background-color: var(--footer-bg);
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: var(--footer-text);
+  user-select: none;
+  transition: background-color 0.3s, color 0.3s;
+  z-index: 1100;
+}
+
+/* Scrollable content sections */
+#last-month-attendance,
+#attendance-status-summary {
+  max-height: 320px;
+  overflow-y: auto;
+  margin-top: 1rem;
+  color: var(--text-color);
+  transition: color 0.3s;
+  background-color: var(--container-bg);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+/* Comment sidebar */
+#comments-sidebar {
+  position: fixed;
+  top: 56px;
+  right: 0;
+  height: calc(100% - 112px);
+  width: 350px;
+  background: var(--container-bg);
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  padding: 20px;
+  display: none;
+  flex-direction: column;
+  z-index: 1200;
+  border-left: 1px solid #dee2e6;
+  box-sizing: border-box;
+  transition: background-color 0.3s, color 0.3s;
+}
+#comments-sidebar.active {
+  display: flex;
+}
+#comments-header {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-color);
+  transition: color 0.3s;
+}
+#close-comments {
+  background-color: var(--btn-delete-bg);
+  border: none;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: background-color 0.3s;
+}
+#close-comments:hover {
+  background-color: var(--btn-delete-hover-bg);
+}
+#comments-list {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  font-size: 0.9rem;
+  color: var(--text-color);
+  transition: color 0.3s;
+}
+.comment-bubble {
+  max-width: 90%;
+  padding: 10px;
+  background-color: var(--comment-bg);
+  border-radius: 8px;
+  box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+}
+.comment-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: var(--comment-name-color);
+  transition: color 0.3s;
+}
+.attendance-list {
+  max-height: 150px;
+  overflow-y: auto;
+  text-align: left;
+  font-size: 0.9rem;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-color);
+  transition: color 0.3s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
   main.container {
-    max-width: 900px;
-    margin: 90px auto 0 auto; /* pushes below navbar */
-    background: var(--container-bg);
-    border-radius: 8px;
-    padding: 50px 30px 120px 30px; /* extra padding-bottom for footer */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    min-height: calc(100vh - 126px); /* full height minus navbar + footer */
-    box-sizing: border-box;
-    transition: background-color 0.3s, color 0.3s;
-    overflow-wrap: break-word;
+    margin: 70px 10px 0 10px !important;
+    padding-bottom: 130px !important;
+    width: auto !important;
   }
-
-  /* Inputs, buttons, select */
-  input,
-  select,
-  button {
-    padding: 8px;
-    margin: 8px 0;
-    border-radius: 5px;
-    border: 1px solid var(--input-border);
-    font-size: 1rem;
-    width: 100%;
-    box-sizing: border-box;
-    background-color: var(--input-bg);
-    color: var(--text-color);
-    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-  }
-  select {
-    cursor: pointer;
-  }
-  button {
-    background-color: var(--btn-bg);
-    border: none;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  button:hover:not(:disabled) {
-    background-color: var(--btn-hover-bg);
-  }
-  button:disabled {
-    background-color: #888888;
-    cursor: not-allowed;
-  }
-  button.delete {
-    background-color: var(--btn-delete-bg);
-  }
-  button.delete:hover:not(:disabled) {
-    background-color: var(--btn-delete-hover-bg);
-  }
-
-  /* Table container */
   .table-container {
-    max-width: 900px;
-    margin: 20px auto;
-    overflow-x: auto;
-    background: transparent;
+    max-width: 100% !important;
+    margin: 10px auto !important;
   }
   table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-    font-size: 0.95rem;
-    word-break: break-word;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
   }
+  #comments-sidebar {
+    width: 80vw;
+    height: calc(100% - 112px);
+  }
+  /* Hide Mark Time and Actions columns for mobile */
+  th:nth-child(4),
+  td:nth-child(4),
+  th:nth-child(5),
+  td:nth-child(5) {
+    display: none;
+  }
+  body,
+  input,
+  button,
+  textarea,
+  table,
   th,
   td {
-    border: 1px solid #dee2e6;
-    padding: 8px;
-    text-align: center;
-    vertical-align: top;
-    color: var(--text-color);
-    transition: color 0.3s;
+    font-size: 0.85rem !important;
   }
-  th {
-    background-color: var(--btn-hover-bg, #016a36);
-    color: #fff;
+  input,
+  button,
+  textarea {
+    padding: 8px !important;
   }
-
-  /* Footer */
-  footer.footer {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    height: 56px;
-    background-color: var(--footer-bg);
-    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.9rem;
-    color: var(--footer-text);
-    user-select: none;
-    transition: background-color 0.3s, color 0.3s;
-    z-index: 1100;
+  nav.navbar {
+    font-size: 1rem !important;
+    padding: 0 0.75rem !important;
   }
-
-  /* Scrollable content sections */
-  #last-month-attendance,
-  #attendance-status-summary {
-    max-height: 320px;
-    overflow-y: auto;
-    margin-top: 1rem;
-    color: var(--text-color);
-    transition: color 0.3s;
-    background-color: var(--container-bg);
-    padding: 10px;
-    border-radius: 8px;
+}
+@media (max-width: 400px) {
+  main.container {
+    margin: 10px auto 70px auto;
+    padding: 15px 10px 130px 10px;
   }
-
-  /* Comment sidebar */
-  #comments-sidebar {
-    position: fixed;
-    top: 56px;
-    right: 0;
-    height: calc(100% - 112px);
-    width: 350px;
-    background: var(--container-bg);
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
-    overflow-y: auto;
-    padding: 20px;
-    display: none;
-    flex-direction: column;
-    z-index: 1200;
-    border-left: 1px solid #dee2e6;
-    box-sizing: border-box;
-    transition: background-color 0.3s, color 0.3s;
+  input,
+  button,
+  textarea {
+    font-size: 1.1rem;
+    padding: 12px;
   }
-  #comments-sidebar.active {
-    display: flex;
-  }
-  #comments-header {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--text-color);
-    transition: color 0.3s;
+  nav.navbar {
+    font-size: 1rem;
+    padding: 0 0.5rem;
   }
   #close-comments {
-    background-color: var(--btn-delete-bg);
-    border: none;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 1.2rem;
-    line-height: 1;
-    transition: background-color 0.3s;
+    font-size: 1.5rem;
   }
-  #close-comments:hover {
-    background-color: var(--btn-delete-hover-bg);
-  }
-  #comments-list {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    overflow-y: auto;
-    font-size: 0.9rem;
-    color: var(--text-color);
-    transition: color 0.3s;
-  }
-  .comment-bubble {
-    max-width: 90%;
-    padding: 10px;
-    background-color: var(--comment-bg);
-    border-radius: 8px;
-    box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    color: var(--text-color);
-    transition: background-color 0.3s, color 0.3s;
-  }
-  .comment-name {
-    font-weight: bold;
-    margin-bottom: 5px;
-    color: var(--comment-name-color);
-    transition: color 0.3s;
-  }
-  .attendance-list {
-    max-height: 150px;
-    overflow-y: auto;
-    text-align: left;
-    font-size: 0.9rem;
-    margin: 0;
-    padding-left: 20px;
-    color: var(--text-color);
-    transition: color 0.3s;
-  }
+}
 
-  /* Responsive */
-  @media (max-width: 768px) {
-    main.container {
-      margin: 70px 10px 0 10px !important;
-      padding-bottom: 130px !important;
-      width: auto !important;
-    }
-    .table-container {
-      max-width: 100% !important;
-      margin: 10px auto !important;
-    }
-    table {
-      display: block;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-    #comments-sidebar {
-      width: 80vw;
-      height: calc(100% - 112px);
-    }
-    /* Hide Mark Time and Actions columns for mobile */
-    th:nth-child(4),
-    td:nth-child(4),
-    th:nth-child(5),
-    td:nth-child(5) {
-      display: none;
-    }
-    body,
-    input,
-    button,
-    textarea,
-    table,
-    th,
-    td {
-      font-size: 0.85rem !important;
-    }
-    input,
-    button,
-    textarea {
-      padding: 8px !important;
-    }
-    nav.navbar {
-      font-size: 1rem !important;
-      padding: 0 0.75rem !important;
-    }
-  }
-  @media (max-width: 400px) {
-    main.container {
-      margin: 10px auto 70px auto;
-      padding: 15px 10px 130px 10px;
-    }
-    input,
-    button,
-    textarea {
-      font-size: 1.1rem;
-      padding: 12px;
-    }
-    nav.navbar {
-      font-size: 1rem;
-      padding: 0 0.5rem;
-    }
-    #close-comments {
-      font-size: 1.5rem;
-    }
-  }
 </style>
-
-
 </head>
 
 <body>
-
   <nav class="navbar">
     <span class="brand">Stechtic</span>
     <div style="display:flex; align-items:center; gap:12px;">
@@ -390,16 +381,11 @@
     <button onclick="addUser()">Add User</button>
     <p id="add-user-msg"></p>
 
-  <h3>Attendance Status Today (<span id="today-date"></span>)</h3>
+    <h3>Attendance Status Today (<span id="today-date"></span>)</h3>
+    <button onclick="showAttendanceStatus()">Show Attendance Status Today</button>
+    <button style="margin-top:20px;" onclick="showLastMonthAttendance()">Show Last 1 Month Attendance</button>
 
-<select id="dateSelect" aria-label="Select Date"></select>
-<button onclick="loadSelectedDate()">Load Date Data</button>
-
-<button onclick="showAttendanceStatus()">Show Attendance Status</button>
-
-<button style="margin-top:20px;" onclick="showLastMonthAttendance()">Show Last 1 Month Attendance</button>
-
- <div id="attendance-status-summary" style="margin-top: 10px; font-weight: bold;"></div>
+    <div id="attendance-status-summary" style="margin-top: 10px; font-weight: bold;"></div>
     <div id="last-month-attendance" style="margin-top:20px; max-height:400px; overflow-y:auto; display:none;"></div>
 
     <div class="table-container">
@@ -484,6 +470,42 @@
     commentsSidebar.setAttribute('aria-hidden', 'true');
   });
 
+  const localDate = new Date();
+  const pad = (n) => n < 10 ? '0' + n : n;
+  const formattedLocalDate = localDate.getFullYear() + '-' + pad(localDate.getMonth() + 1) + '-' + pad(localDate.getDate());
+  document.getElementById('today-date').textContent = formattedLocalDate;
+
+  async function addUser() {
+    const name = document.getElementById('new-name').value.trim();
+    const email = document.getElementById('new-email').value.trim();
+    const password = document.getElementById('new-password').value.trim();
+    const msg = document.getElementById('add-user-msg');
+    msg.textContent = '';
+    msg.className = '';
+
+    if (!name || !email || !password) {
+      msg.textContent = 'Enter name, email and password';
+      msg.className = 'error';
+      return;
+    }
+
+    const existingUser = await db.collection('users').where('email', '==', email).get();
+    if (!existingUser.empty) {
+      msg.textContent = 'User with this email already exists';
+      msg.className = 'error';
+      return;
+    }
+
+    await db.collection('users').add({ name, email, password, role: 'student' });
+    msg.textContent = 'User added successfully';
+    document.getElementById('new-name').value = '';
+    document.getElementById('new-email').value = '';
+    document.getElementById('new-password').value = '';
+
+    loadAttendanceStatus();
+  }
+
+
   function convert24To12Hour(time24) {
     const [hourStr, minute, second] = time24.split(':');
     let hour = parseInt(hourStr, 10);
@@ -508,36 +530,38 @@
     return div.innerHTML;
   }
 
-  async function loadAttendanceStatusForDate(dateStr) {
+ 
+  async function loadAttendanceStatus() {
     document.getElementById('attendance-table').style.display = 'table';
     document.getElementById('attendance-status-summary').style.display = 'block';
     document.getElementById('last-month-attendance').style.display = 'none';
-
+  
     const tbody = document.getElementById('attendance-body');
     tbody.innerHTML = '';
-
+  
     const usersSnapshot = await db.collection('users').get();
     const attendanceSnapshot = await db.collection('attendance')
-      .where('date', '==', dateStr)
+      .where('date', '==', formattedLocalDate)
       .get();
-
+  
     const attendanceMap = {};
     attendanceSnapshot.forEach(doc => {
       const data = doc.data();
       attendanceMap[data.userId] = { ...data, id: doc.id };
     });
-
+  
     usersSnapshot.forEach(userDoc => {
       const user = userDoc.data();
       const userId = userDoc.id;
       const attendance = attendanceMap[userId];
       const row = document.createElement('tr');
-
+  
       row.innerHTML = `
         <td>${user.name || '-'}</td>
         <td>${user.email}</td>
         <td>${attendance ? 'Yes' : 'No'}</td>
         <td>${attendance ? convert24To12Hour(attendance.time) : '-'}</td>
+  
         <td>
           <button class="delete" onclick="deleteUser('${userId}')">Delete User</button>
           ${attendance ? `<button class="delete" onclick="deleteAttendance('${attendance.id}')">Delete Attendance</button>` : ''}
@@ -547,16 +571,86 @@
     });
   }
 
-  async function loadComments(dateStr) {
+
+  async function deleteUser(userId) {
+    if (!confirm('Delete user and all their attendance?')) return;
+
+    const attSnapshot = await db.collection('attendance').where('userId', '==', userId).get();
+    const batch = db.batch();
+
+    attSnapshot.forEach(doc => batch.delete(doc.ref));
+    batch.delete(db.collection('users').doc(userId));
+
+    await batch.commit();
+
+    alert('User and attendance deleted');
+    loadAttendanceStatus();
+  }
+
+  async function deleteAttendance(attendanceId) {
+    if (!confirm('Delete this attendance record?')) return;
+
+    await db.collection('attendance').doc(attendanceId).delete();
+
+    alert('Attendance deleted');
+    loadAttendanceStatus();
+  }
+
+  async function showAttendanceStatus() {
+    const summaryDiv = document.getElementById('attendance-status-summary');
+    summaryDiv.textContent = 'Loading attendance summary...';
+
+    const usersSnapshot = await db.collection('users').get();
+    const attendanceSnapshot = await db.collection('attendance')
+      .where('date', '==', formattedLocalDate)
+      .get();
+
+    const attendanceMap = {};
+    attendanceSnapshot.forEach(doc => {
+      attendanceMap[doc.data().userId] = true;
+    });
+
+    let markedCount = 0;
+    let notMarkedCount = 0;
+    const markedUsers = [];
+    const notMarkedUsers = [];
+
+    usersSnapshot.forEach(userDoc => {
+      const user = userDoc.data();
+      const userId = userDoc.id;
+      if (attendanceMap[userId]) {
+        markedCount++;
+        markedUsers.push(user.email);
+      } else {
+        notMarkedCount++;
+        notMarkedUsers.push(user.email);
+      }
+    });
+
+    summaryDiv.innerHTML = `
+      <p>Attendance Today: Marked - ${markedCount}, Not Marked - ${notMarkedCount}</p>
+      <p><b>Marked:</b> ${markedUsers.join(', ') || 'None'}</p>
+      <p><b>Not Marked:</b> ${notMarkedUsers.join(', ') || 'None'}</p>
+    `;
+
+    loadComments(formattedLocalDate);
+    toggleComments(false);
+
+    document.getElementById('last-month-attendance').style.display = 'none';
+    summaryDiv.style.display = 'block';
+    document.getElementById('attendance-table').style.display = 'table';
+  }
+
+  async function loadComments(date) {
     const commentsList = document.getElementById('comments-list');
     commentsList.innerHTML = '<p>Loading comments...</p>';
 
     const snapshot = await db.collection('attendance')
-      .where('date', '==', dateStr)
+      .where('date', '==', date)
       .get();
 
     if (snapshot.empty) {
-      commentsList.innerHTML = '<p>No comments for this day.</p>';
+      commentsList.innerHTML = '<p>No comments for today.</p>';
       return;
     }
 
@@ -589,98 +683,8 @@
     });
 
     if (commentsList.children.length === 0) {
-      commentsList.innerHTML = '<p>No comments for this day.</p>';
+      commentsList.innerHTML = '<p>No comments for today.</p>';
     }
-  }
-
-  async function populateDateDropdown() {
-    const select = document.getElementById('dateSelect');
-    select.innerHTML = '';
-    const today = new Date();
-
-    for(let i = 0; i < 30; i++) {
-      const dateObj = new Date();
-      dateObj.setDate(today.getDate() - i);
-      const dateStr = dateObj.toISOString().slice(0, 10);
-
-      const snap = await db.collection('attendance')
-        .where('date', '==', dateStr)
-        .limit(1)
-        .get();
-
-      if (!snap.empty) {
-        const option = document.createElement('option');
-        option.value = dateStr;
-        option.text = dateStr;
-        if (i === 0) option.selected = true;
-        select.appendChild(option);
-      }
-    }
-
-    if (select.options.length > 0) {
-      loadSelectedDate();
-    }
-  }
-
-  async function loadSelectedDate() {
-    const dateStr = document.getElementById('dateSelect').value;
-    document.getElementById('today-date').textContent = dateStr;
-    await loadAttendanceStatusForDate(dateStr);
-    await loadComments(dateStr);
-  }
-
-  async function addUser() {
-    const name = document.getElementById('new-name').value.trim();
-    const email = document.getElementById('new-email').value.trim();
-    const password = document.getElementById('new-password').value.trim();
-    const msg = document.getElementById('add-user-msg');
-    msg.textContent = '';
-    msg.className = '';
-
-    if (!name || !email || !password) {
-      msg.textContent = 'Enter name, email and password';
-      msg.className = 'error';
-      return;
-    }
-
-    const existingUser = await db.collection('users').where('email', '==', email).get();
-    if (!existingUser.empty) {
-      msg.textContent = 'User with this email already exists';
-      msg.className = 'error';
-      return;
-    }
-
-    await db.collection('users').add({ name, email, password, role: 'student' });
-    msg.textContent = 'User added successfully';
-    document.getElementById('new-name').value = '';
-    document.getElementById('new-email').value = '';
-    document.getElementById('new-password').value = '';
-
-    loadAttendanceStatusForDate(document.getElementById('dateSelect').value || new Date().toISOString().slice(0,10));
-  }
-
-  async function deleteUser(userId) {
-    if (!confirm('Delete user and all their attendance?')) return;
-
-    const attSnapshot = await db.collection('attendance').where('userId', '==', userId).get();
-    const batch = db.batch();
-
-    attSnapshot.forEach(doc => batch.delete(doc.ref));
-    batch.delete(db.collection('users').doc(userId));
-
-    await batch.commit();
-
-    alert('User and attendance deleted');
-    loadAttendanceStatusForDate(document.getElementById('dateSelect').value || new Date().toISOString().slice(0,10));
-  }
-
-  async function deleteAttendance(attendanceId) {
-    if (!confirm('Delete this attendance record?')) return;
-
-    await db.collection('attendance').doc(attendanceId).delete();
-
-    alert('Attendance deleted');
-    loadAttendanceStatusForDate(document.getElementById('dateSelect').value || new Date().toISOString().slice(0,10));
   }
 
   async function showLastMonthAttendance() {
@@ -742,15 +746,10 @@
     document.getElementById('attendance-table').style.display = 'none';
   }
 
-  window.onload = () => {
-    populateDateDropdown();
-  };
+  // Initial load
+  loadAttendanceStatus();
 </script>
-
 
 </body>
 
-
 </html>
-
-
